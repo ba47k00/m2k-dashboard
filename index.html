@@ -1,1 +1,740 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="M2K"/>
+<meta name="theme-color" content="#0a0a0f"/>
+<title>M2K Dashboard</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,'Segoe UI',sans-serif;background:#0a0a0f;color:#e2e8f0;min-height:100vh;padding-bottom:80px}
+input,select,textarea{font-family:inherit;font-size:16px}
+button{font-family:inherit;cursor:pointer}
+.card{background:#111827;border-radius:16px;padding:16px;border:1px solid #1e293b;margin-bottom:12px}
+.inp{width:100%;background:#0f172a;border:1px solid #1e293b;border-radius:12px;padding:12px 14px;color:#e2e8f0;font-size:16px;outline:none;-webkit-appearance:none;box-sizing:border-box}
+.btnP{background:linear-gradient(135deg,#7c3aed,#2563eb);color:#fff;border:none;border-radius:14px;padding:14px;font-weight:700;font-size:15px;width:100%}
+.btnS{background:#1e293b;border:none;border-radius:14px;padding:14px;color:#94a3b8;font-weight:600;font-size:15px;width:100%}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:300;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:#111827;border-radius:24px 24px 0 0;padding:20px 20px 40px;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;border:1px solid #1e293b}
+.handle{width:40px;height:4px;border-radius:2px;background:#374151;margin:0 auto 20px}
+.chip{padding:8px 14px;border-radius:20px;font-size:13px;border:1px solid #1e293b;background:none;color:#64748b}
+.chip.on{background:rgba(124,58,237,0.13);border-color:#7c3aed;color:#a78bfa;font-weight:600}
+.field{margin-bottom:16px}
+.field label{font-size:13px;color:#64748b;margin-bottom:6px;display:block}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.bnav{position:fixed;bottom:0;left:0;right:0;background:#0f172a;border-top:1px solid #1e293b;display:flex;z-index:200;padding-bottom:env(safe-area-inset-bottom,0px);overflow-x:auto}
+.nbtn{flex:0 0 auto;min-width:62px;background:none;border:none;padding:10px 8px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;color:#475569}
+.nbtn.on{color:#a78bfa}
+.hdr{background:linear-gradient(135deg,#1a0533,#0d1b2a);padding:16px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;border-bottom:1px solid #1e293b}
+.logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#7c3aed,#2563eb);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff;flex-shrink:0}
+.pg{padding:16px}
+.hide{display:none}
+.sbar{background:#0f172a;padding:8px 16px;display:flex;align-items:center;gap:8px;font-size:12px;color:#64748b;border-bottom:1px solid #1e293b}
+.sdot{width:8px;height:8px;border-radius:50%;background:#10b981;flex-shrink:0}
+.sdot.spin{background:#f59e0b;animation:pu 1s infinite}
+.sdot.err{background:#ef4444}
+@keyframes pu{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes sl{0%{transform:translateX(-100%)}100%{transform:translateX(250%)}}
+.prog{height:6px;border-radius:3px;background:#1e293b}
+.pb{height:100%;border-radius:3px;background:linear-gradient(90deg,#7c3aed,#2563eb);transition:width .3s}
+.sx{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.cw{display:flex;flex-wrap:wrap;gap:8px}
+textarea.inp{resize:none}
+</style>
+</head>
+<body>
 
+<div id="LS" style="position:fixed;inset:0;background:#0a0a0f;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999">
+  <div style="width:60px;height:60px;border-radius:16px;background:linear-gradient(135deg,#7c3aed,#2563eb);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900;color:#fff;margin-bottom:20px">M</div>
+  <div style="font-size:20px;font-weight:800;color:#fff;margin-bottom:8px">M2K Dashboard</div>
+  <div id="LM" style="font-size:13px;color:#64748b">Connexion Firebase...</div>
+  <div style="margin-top:20px;width:40px;height:4px;border-radius:2px;background:#1e293b;overflow:hidden">
+    <div style="height:100%;width:40px;background:linear-gradient(90deg,#7c3aed,#2563eb);animation:sl 1s infinite"></div>
+  </div>
+</div>
+
+<div id="APP" class="hide">
+  <div class="hdr">
+    <div class="logo">M</div>
+    <div>
+      <div style="font-size:18px;font-weight:800;color:#fff">M2K Dashboard</div>
+      <div style="font-size:11px;color:#64748b">Manager Pro</div>
+    </div>
+    <div style="margin-left:auto;text-align:right">
+      <div id="HS" style="font-size:13px;color:#10b981;font-weight:600">0€</div>
+      <div style="font-size:10px;color:#64748b">solde</div>
+    </div>
+  </div>
+  <div class="sbar">
+    <div id="SD" class="sdot"></div>
+    <span id="SL">Connexion...</span>
+    <button onclick="syncNow()" style="margin-left:auto;background:#1e293b;border:none;border-radius:8px;padding:4px 10px;color:#94a3b8;font-size:12px">Sync</button>
+  </div>
+  <div class="pg hide" id="p-overview"></div>
+  <div class="pg hide" id="p-projects"></div>
+  <div class="pg hide" id="p-calendar"></div>
+  <div class="pg hide" id="p-budget"></div>
+  <div class="pg hide" id="p-social"></div>
+  <div class="pg hide" id="p-contacts"></div>
+  <div class="pg hide" id="p-revenues"></div>
+  <div class="pg hide" id="p-tasks"></div>
+  <div class="pg hide" id="p-pitch"></div>
+  <div class="bnav" id="BN"></div>
+</div>
+<div id="MC"></div>
+
+<script>
+var FB_URL = "https://m2k-dashboard-b2b06-default-rtdb.europe-west1.firebasedatabase.app";
+var FB_KEY = "AIzaSyBIVqd8jZZO1IoEPdEbt2KgVolzpK0wsAs";
+var FB_PATH = "/m2k.json";
+
+var DB = {projects:[],tasks:[],calEvents:[],contacts:[],revenues:[],expenses:[],stats:{totalStreams:0,platforms:0,countries:0}};
+var curTab = "overview";
+var svTO = null;
+var calM = new Date().getMonth();
+var calY = new Date().getFullYear();
+var TF = {};
+
+var TABS = [
+  {id:"overview",icon:"📊",label:"Accueil"},
+  {id:"projects",icon:"🎵",label:"Projets"},
+  {id:"calendar",icon:"🗓️",label:"Agenda"},
+  {id:"budget",icon:"💸",label:"Budget"},
+  {id:"social",icon:"🎨",label:"Social"},
+  {id:"contacts",icon:"📇",label:"Contacts"},
+  {id:"revenues",icon:"💰",label:"Revenus"},
+  {id:"tasks",icon:"📝",label:"Tâches"},
+  {id:"pitch",icon:"🎤",label:"Pitch"}
+];
+
+var SC = {"En cours":"#f59e0b","Prêt":"#3b82f6","Distribué":"#10b981","En promo":"#8b5cf6"};
+var PL = ["Spotify","Apple Music","Deezer","YouTube Music","Tidal","Amazon Music","Boomplay","Audiomack","SoundCloud","iTunes"];
+var RG = ["🌍 Afrique","🇪🇺 Europe","🇺🇸 USA/Canada","🌏 Asie","🌎 Amérique Latine","🌐 Mondial"];
+var ST = ["En cours","Prêt","Distribué","En promo"];
+var CT = ["Label","Distribution","Média","Playlist","Booking","Sponsor","Autre"];
+var CC = {Label:"#7c3aed",Distribution:"#2563eb","Média":"#f59e0b",Playlist:"#10b981",Booking:"#ef4444",Sponsor:"#ec4899",Autre:"#64748b"};
+var CS = ["À contacter","Contacté","En discussion","Partenaire","Inactif"];
+var RT = ["Streaming","Vente","Live","Sync","Droits","Autre"];
+var TC = {Streaming:"#7c3aed",Vente:"#2563eb",Live:"#ef4444",Sync:"#f59e0b",Droits:"#10b981",Autre:"#64748b"};
+var EC = ["Studio","Vidéo","Promo","Distribution","Graphisme","Équipement","Autre"];
+var ECC = {Studio:"#7c3aed","Vidéo":"#ef4444",Promo:"#ec4899",Distribution:"#2563eb",Graphisme:"#f59e0b","Équipement":"#10b981",Autre:"#64748b"};
+var SN = ["Instagram","TikTok","X (Twitter)","Facebook","YouTube"];
+var SP = ["Annonce sortie","Teaser","Promo","Engagement","Remerciement","Behind the scenes"];
+var ET = ["Sortie","Promo","Clip","Live","Interview","Campagne","Autre"];
+var EVC = {Sortie:"#7c3aed",Promo:"#2563eb",Clip:"#f59e0b",Live:"#ef4444",Interview:"#10b981",Campagne:"#ec4899",Autre:"#64748b"};
+var MN = ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"];
+var DN = ["L","M","M","J","V","S","D"];
+
+// Firebase
+function fbUrl() { return FB_URL + FB_PATH + "?auth=" + FB_KEY; }
+
+async function fbGet() {
+  var r = await fetch(fbUrl());
+  return await r.json();
+}
+
+async function fbSet(data) {
+  await fetch(fbUrl(), {method:"PUT", headers:{"Content-Type":"application/json"}, body:JSON.stringify(data)});
+}
+
+async function loadDB() {
+  setSS("spin","Connexion...");
+  try {
+    var d = await fbGet();
+    if (d && d.projects) DB = Object.assign({}, DB, d);
+    setSS("ok","Firebase ✓");
+  } catch(e) {
+    setSS("err","Mode local");
+    var s = localStorage.getItem("m2k_local");
+    if (s) DB = JSON.parse(s);
+  }
+  document.getElementById("LS").style.display = "none";
+  document.getElementById("APP").classList.remove("hide");
+  buildNav();
+  setTab("overview");
+}
+
+async function syncNow() {
+  setSS("spin","Sync...");
+  try { await fbSet(DB); setSS("ok","Synchronisé ✓"); }
+  catch(e) { setSS("err","Erreur sync"); }
+}
+
+function setSS(state, label) {
+  var d = document.getElementById("SD");
+  var l = document.getElementById("SL");
+  d.className = "sdot" + (state==="spin"?" spin":state==="err"?" err":"");
+  l.textContent = label;
+}
+
+function save(nd) {
+  DB = Object.assign({}, nd);
+  localStorage.setItem("m2k_local", JSON.stringify(DB));
+  clearTimeout(svTO);
+  svTO = setTimeout(function() {
+    setSS("spin","Sauvegarde...");
+    fbSet(DB).then(function(){ setSS("ok","Sauvegardé ✓"); }).catch(function(){ setSS("err","Erreur sync"); });
+  }, 1000);
+  renderCur();
+  updateHdr();
+}
+
+function updateHdr() {
+  var rev = (DB.revenues||[]).reduce(function(s,r){ return s+(parseFloat(r.amount)||0); },0);
+  var exp = (DB.expenses||[]).reduce(function(s,e){ return s+(parseFloat(e.amount)||0); },0);
+  var sol = rev - exp;
+  document.getElementById("HS").textContent = (sol>=0?"+":"") + sol.toFixed(0) + "€";
+}
+
+// Nav
+function buildNav() {
+  var nav = document.getElementById("BN");
+  nav.innerHTML = TABS.map(function(t) {
+    return '<button class="nbtn'+(curTab===t.id?" on":"")+ '" onclick="setTab(\''+t.id+'\')">'
+      +'<span style="font-size:18px">'+t.icon+'</span>'
+      +'<span style="font-size:9px;white-space:nowrap">'+t.label+'</span>'
+      +(curTab===t.id?'<div style="width:16px;height:2px;border-radius:1px;background:#7c3aed;margin-top:1px"></div>':'')
+      +'</button>';
+  }).join("");
+}
+
+function setTab(id) {
+  document.getElementById("p-"+curTab).classList.add("hide");
+  curTab = id;
+  document.getElementById("p-"+id).classList.remove("hide");
+  buildNav();
+  renderCur();
+}
+
+function renderCur() {
+  var fns = {overview:rOverview,projects:rProjects,calendar:rCalendar,budget:rBudget,social:rSocial,contacts:rContacts,revenues:rRevenues,tasks:rTasks,pitch:rPitch};
+  if (fns[curTab]) fns[curTab]();
+}
+
+// Helpers
+function tg(color, text) {
+  return '<span style="font-size:11px;padding:3px 10px;border-radius:20px;background:'+color+'22;color:'+color+';border:1px solid '+color+'44;display:inline-block">'+text+'</span>';
+}
+
+function closeModal() { document.getElementById("MC").innerHTML = ""; }
+
+function togArr(field, val) {
+  if (!TF[field]) TF[field] = [];
+  var i = TF[field].indexOf(val);
+  if (i >= 0) TF[field].splice(i,1); else TF[field].push(val);
+}
+
+function chipRow(items, field, colorMap) {
+  return items.map(function(o) {
+    var active = TF[field] === o;
+    var col = colorMap ? (colorMap[o]||"#7c3aed") : "#7c3aed";
+    return '<button class="chip'+(active?" on":"")+'" style="'+(active?"background:"+col+"22;border-color:"+col+";color:"+col:"")
+      +'" onclick="TF[\''+field.replace(/'/g,"\\'")+'\']=\''+o.replace(/'/g,"\\'")+'\';this.closest(\'.cw,.sx\').querySelectorAll(\'.chip\').forEach(function(b){b.classList.remove(\'on\');b.removeAttribute(\'style\')});this.classList.add(\'on\');this.style.background=\''+col+'22\';this.style.borderColor=\''+col+'\';this.style.color=\''+col+'\'">'+o+'</button>';
+  }).join("");
+}
+
+// OVERVIEW
+function rOverview() {
+  var rev = (DB.revenues||[]).reduce(function(s,r){ return s+(parseFloat(r.amount)||0); },0);
+  var exp = (DB.expenses||[]).reduce(function(s,e){ return s+(parseFloat(e.amount)||0); },0);
+  var sol = rev - exp;
+  var tasks = (DB.tasks||[]).filter(function(t){ return !t.done; }).slice(0,3);
+  document.getElementById("p-overview").innerHTML =
+    '<div style="font-weight:700;font-size:18px;margin-bottom:16px">Vue d\'ensemble</div>'
+    +'<div class="g2">'
+    +[["▶️","Streams",(DB.stats.totalStreams||0).toLocaleString(),"#7c3aed"],
+      ["📡","Plateformes",DB.stats.platforms||0,"#2563eb"],
+      ["💚","Revenus",rev.toFixed(0)+"€","#10b981"],
+      ["🔴","Dépenses",exp.toFixed(0)+"€","#ef4444"]].map(function(s) {
+      return '<div class="card" style="margin-bottom:0;border-color:'+s[3]+'33"><div style="font-size:20px">'+s[0]+'</div>'
+        +'<div style="font-size:20px;font-weight:800;color:'+s[3]+';margin:4px 0 2px">'+s[2]+'</div>'
+        +'<div style="font-size:12px;color:#64748b">'+s[1]+'</div></div>';
+    }).join("")+'</div>'
+    +'<div class="card" style="background:linear-gradient(135deg,#0f2027,#111827);border-color:'+(sol>=0?"#7c3aed":"#f59e0b")+'44;margin-top:4px">'
+    +'<div style="font-size:12px;color:#64748b">Solde net</div>'
+    +'<div style="font-size:28px;font-weight:900;color:'+(sol>=0?"#7c3aed":"#f59e0b")+'">'+(sol>=0?"+":"")+sol.toFixed(0)+'€</div></div>'
+    +'<div class="card"><div style="font-weight:700;margin-bottom:12px;color:#a78bfa">Derniers projets</div>'
+    +((DB.projects||[]).length===0?'<div style="color:#475569;font-size:13px">Aucun projet.</div>'
+      :(DB.projects||[]).slice(-3).reverse().map(function(p) {
+        return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #1e293b">'
+          +'<div style="width:8px;height:8px;border-radius:50%;background:'+(SC[p.status]||"#64748b")+';flex-shrink:0"></div>'
+          +'<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+p.title+'</div>'
+          +'<div style="font-size:12px;color:#64748b">'+p.type+' · '+parseInt(p.streams||0).toLocaleString()+' streams</div></div>'
+          +tg(SC[p.status]||"#64748b",p.status)+'</div>';
+      }).join(""))+'</div>'
+    +'<div class="card"><div style="font-weight:700;margin-bottom:12px;color:#a78bfa">Tâches</div>'
+    +(tasks.length===0?'<div style="color:#10b981;font-size:13px">Tout est fait !</div>'
+      :tasks.map(function(t){ return '<div style="font-size:14px;padding:8px 0;border-bottom:1px solid #1e293b;color:#94a3b8">⬜ '+t.text+'</div>'; }).join(""))+'</div>';
+}
+
+// PROJECTS
+function rProjects() {
+  document.getElementById("p-projects").innerHTML =
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
+    +'<span style="font-weight:700;font-size:17px">Projets</span>'
+    +'<button class="btnP" style="width:auto;padding:10px 18px;border-radius:12px;font-size:14px" onclick="oProjForm()">+ Nouveau</button></div>'
+    +((DB.projects||[]).length===0?'<div style="color:#475569;text-align:center;padding:40px">Aucun projet.</div>'
+      :(DB.projects||[]).map(function(p) {
+        return '<div class="card">'
+          +'<div style="display:flex;justify-content:space-between;margin-bottom:8px">'
+          +'<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:16px;margin-bottom:6px">'+p.title+'</div>'
+          +'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">'+tg("#94a3b8",p.type)+tg(SC[p.status]||"#64748b",p.status)+'</div></div>'
+          +'<div style="display:flex;gap:6px;flex-shrink:0;margin-left:8px">'
+          +'<button onclick="oProjForm('+p.id+')" style="background:#1e293b;border:none;border-radius:10px;padding:8px 12px;color:#94a3b8">✏️</button>'
+          +'<button onclick="delProj('+p.id+')" style="background:#1e293b;border:none;border-radius:10px;padding:8px 12px;color:#ef4444">🗑️</button></div></div>'
+          +(p.releaseDate?'<div style="font-size:13px;color:#64748b;margin-bottom:8px">📅 '+new Date(p.releaseDate).toLocaleDateString("fr-FR")+'</div>':"")
+          +'<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px">'+(p.platforms||[]).map(function(pl){ return tg("#7c3aed",pl); }).join("")+'</div>'
+          +'<div style="display:flex;flex-wrap:wrap;gap:6px">'+(p.regions||[]).map(function(r){ return tg("#10b981",r); }).join("")+'</div>'
+          +(p.notes?'<div style="margin-top:8px;font-size:13px;color:#94a3b8;font-style:italic">'+p.notes+'</div>':"")
+          +'<div style="margin-top:10px;text-align:right;font-size:14px;font-weight:700;color:#7c3aed">'+parseInt(p.streams||0).toLocaleString()+' streams</div></div>';
+      }).join(""));
+}
+
+function oProjForm(id) {
+  var p = id ? (DB.projects||[]).find(function(x){ return x.id===id; }) : null;
+  TF = p ? JSON.parse(JSON.stringify(p)) : {title:"",type:"Single",status:"En cours",releaseDate:"",platforms:[],regions:[],streams:0,notes:"",id:null};
+  document.getElementById("MC").innerHTML =
+    '<div class="overlay" onclick="if(event.target===this)closeModal()">'
+    +'<div class="sheet"><div class="handle"></div>'
+    +'<div style="font-weight:700;font-size:18px;margin-bottom:20px;color:#a78bfa">'+(id?"Modifier":"Nouveau Projet")+'</div>'
+    +'<div class="field"><label>Titre</label><input class="inp" id="pf-t" value="'+(TF.title||"")+'"/></div>'
+    +'<div class="field"><label>Date de sortie</label><input class="inp" type="date" id="pf-d" value="'+(TF.releaseDate||"")+'"/></div>'
+    +'<div class="field"><label>Streams</label><input class="inp" type="number" id="pf-s" value="'+(TF.streams||0)+'"/></div>'
+    +'<div class="field"><label>Type</label><select class="inp" id="pf-tp">'+["Single","EP","Album","Mixtape","Clip"].map(function(t){ return '<option'+(TF.type===t?" selected":"")+'>'+t+'</option>'; }).join("")+'</select></div>'
+    +'<div class="field"><label>Statut</label><div class="cw">'+ST.map(function(s) {
+      var active = TF.status===s;
+      var col = SC[s]||"#7c3aed";
+      return '<button class="chip'+(active?" on":"")+'" style="'+(active?"background:"+col+"22;border-color:"+col+";color:"+col:"")
+        +'" onclick="TF.status=\''+s+'\';this.closest(\'.cw\').querySelectorAll(\'.chip\').forEach(function(b){b.classList.remove(\'on\');b.removeAttribute(\'style\')});this.classList.add(\'on\');this.style.background=\''+col+'22\';this.style.borderColor=\''+col+'\';this.style.color=\''+col+'\'">'+s+'</button>';
+    }).join("")+'</div></div>'
+    +'<div class="field"><label>Plateformes</label><div class="cw">'+PL.map(function(pl) {
+      var active = (TF.platforms||[]).indexOf(pl)>=0;
+      return '<button class="chip'+(active?" on":"")+'" onclick="togArr(\'platforms\',\''+pl+'\');this.classList.toggle(\'on\')">'+pl+'</button>';
+    }).join("")+'</div></div>'
+    +'<div class="field"><label>Régions</label><div class="cw">'+RG.map(function(r) {
+      var active = (TF.regions||[]).indexOf(r)>=0;
+      return '<button class="chip'+(active?" on":"")+'" onclick="togArr(\'regions\',\''+r.replace(/'/g,"\\'")+'\');this.classList.toggle(\'on\')">'+r+'</button>';
+    }).join("")+'</div></div>'
+    +'<div class="field"><label>Notes</label><textarea class="inp" id="pf-n" rows="2">'+(TF.notes||"")+'</textarea></div>'
+    +'<div style="display:flex;gap:10px;margin-top:8px">'
+    +'<button class="btnS" style="flex:1" onclick="closeModal()">Annuler</button>'
+    +'<button class="btnP" style="flex:2" onclick="svProjForm('+(id||"null")+')">Sauvegarder</button>'
+    +'</div></div></div>';
+}
+
+function svProjForm(id) {
+  var p = Object.assign({}, TF, {
+    title: document.getElementById("pf-t").value,
+    releaseDate: document.getElementById("pf-d").value,
+    streams: parseInt(document.getElementById("pf-s").value)||0,
+    type: document.getElementById("pf-tp").value,
+    notes: document.getElementById("pf-n").value
+  });
+  if (!p.title) return;
+  var projs = DB.projects||[];
+  if (id) projs = projs.map(function(x){ return x.id===id?Object.assign({},p,{id:id}):x; });
+  else projs = projs.concat([Object.assign({},p,{id:Date.now()})]);
+  var allPl = [];
+  var allRg = [];
+  projs.forEach(function(x){ (x.platforms||[]).forEach(function(pl){ if(allPl.indexOf(pl)<0)allPl.push(pl); }); });
+  projs.forEach(function(x){ (x.regions||[]).forEach(function(r){ if(allRg.indexOf(r)<0)allRg.push(r); }); });
+  save(Object.assign({},DB,{projects:projs,stats:{totalStreams:projs.reduce(function(s,x){ return s+(parseInt(x.streams)||0); },0),platforms:allPl.length,countries:allRg.length*3}}));
+  closeModal();
+}
+
+function delProj(id) {
+  if (confirm("Supprimer ce projet ?"))
+    save(Object.assign({},DB,{projects:(DB.projects||[]).filter(function(p){ return p.id!==id; })}));
+}
+
+// TASKS
+function rTasks() {
+  document.getElementById("p-tasks").innerHTML =
+    '<div style="font-weight:700;font-size:17px;margin-bottom:16px">Tâches Stratégiques</div>'
+    +'<div style="display:flex;gap:10px;margin-bottom:16px">'
+    +'<input class="inp" id="TI" placeholder="Nouvelle tâche..." style="flex:1" onkeydown="if(event.key===\'Enter\')addTask()"/>'
+    +'<button onclick="addTask()" style="background:linear-gradient(135deg,#7c3aed,#2563eb);color:#fff;border:none;border-radius:12px;padding:12px 18px;font-weight:700;font-size:18px">+</button></div>'
+    +((DB.tasks||[]).length===0?'<div style="color:#475569;text-align:center;padding:30px">Aucune tâche.</div>'
+      :(DB.tasks||[]).map(function(t) {
+        return '<div class="card" style="display:flex;align-items:center;gap:12px;opacity:'+(t.done?.6:1)+'">'
+          +'<button onclick="togTask('+t.id+')" style="width:28px;height:28px;border-radius:8px;background:'+(t.done?"#10b981":"none")+';border:2px solid '+(t.done?"#10b981":"#374151")+';display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;flex-shrink:0">'+(t.done?"✓":"")+'</button>'
+          +'<span style="flex:1;font-size:15px;text-decoration:'+(t.done?"line-through":"none")+';color:'+(t.done?"#64748b":"#e2e8f0")+'">'+t.text+'</span>'
+          +'<button onclick="delTask('+t.id+')" style="background:none;border:none;color:#ef4444;font-size:22px;padding:4px 8px">×</button></div>';
+      }).join(""));
+}
+
+function addTask() {
+  var v = document.getElementById("TI").value.trim();
+  if (!v) return;
+  save(Object.assign({},DB,{tasks:(DB.tasks||[]).concat([{id:Date.now(),text:v,done:false}])}));
+}
+
+function togTask(id) {
+  save(Object.assign({},DB,{tasks:(DB.tasks||[]).map(function(t){ return t.id===id?Object.assign({},t,{done:!t.done}):t; })}));
+}
+
+function delTask(id) {
+  save(Object.assign({},DB,{tasks:(DB.tasks||[]).filter(function(t){ return t.id!==id; })}));
+}
+
+// CALENDAR
+function dk(d) {
+  return calY+"-"+String(calM+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");
+}
+
+function getEvs(d) {
+  var key = dk(d);
+  var pe = (DB.projects||[]).filter(function(p){ return p.releaseDate===key; }).map(function(p){ return {title:p.title,type:"Sortie"}; });
+  var ce = (DB.calEvents||[]).filter(function(e){ return e.date===key; });
+  return pe.concat(ce);
+}
+
+function rCalendar() {
+  var today = new Date();
+  var fd = new Date(calY,calM,1).getDay();
+  var off = fd===0?6:fd-1;
+  var dim = new Date(calY,calM+1,0).getDate();
+  var cells = "";
+  for (var i=0;i<off;i++) cells += "<div></div>";
+  for (var d=1;d<=dim;d++) {
+    var evs = getEvs(d);
+    var isTd = d===today.getDate()&&calM===today.getMonth()&&calY===today.getFullYear();
+    cells += '<div onclick="oDayModal('+d+')" style="min-height:52px;border-radius:10px;background:'+(isTd?"#1e1040":"#111827")+';border:1px solid '+(isTd?"#7c3aed":"#1e293b")+';padding:5px 4px;cursor:pointer">'
+      +'<div style="font-size:12px;font-weight:'+(isTd?800:500)+';color:'+(isTd?"#a78bfa":"#94a3b8")+';text-align:center;margin-bottom:2px">'+d+'</div>'
+      +(evs.slice(0,1).map(function(e){ return '<div style="font-size:9px;border-radius:3px;padding:1px 3px;background:'+(EVC[e.type]||"#64748b")+'44;color:'+(EVC[e.type]||"#94a3b8")+';overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+e.title+'</div>'; }).join(""))
+      +(evs.length>1?'<div style="font-size:9px;color:#64748b;text-align:center">+'+(evs.length-1)+'</div>':"")
+      +'</div>';
+  }
+  var upcoming = [];
+  for (var dd=1;dd<=dim;dd++) {
+    getEvs(dd).forEach(function(e){ upcoming.push(Object.assign({},e,{day:dd,key:dk(dd)})); });
+  }
+  var future = upcoming.filter(function(e){ return new Date(e.key)>=new Date(today.toDateString()); }).slice(0,5);
+
+  document.getElementById("p-calendar").innerHTML =
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">'
+    +'<span style="font-weight:700;font-size:17px">'+MN[calM]+" "+calY+'</span>'
+    +'<div style="display:flex;gap:8px">'
+    +'<button onclick="calM--;if(calM<0){calM=11;calY--;}rCalendar()" style="background:#1e293b;border:none;border-radius:10px;padding:8px 14px;color:#94a3b8;font-size:16px">‹</button>'
+    +'<button onclick="calM++;if(calM>11){calM=0;calY++;}rCalendar()" style="background:#1e293b;border:none;border-radius:10px;padding:8px 14px;color:#94a3b8;font-size:16px">›</button>'
+    +'</div></div>'
+    +'<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:3px">'+DN.map(function(d){ return '<div style="text-align:center;font-size:11px;color:#64748b;padding:4px 0;font-weight:600">'+d+'</div>'; }).join("")+'</div>'
+    +'<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:20px">'+cells+'</div>'
+    +'<div class="card"><div style="font-weight:600;color:#a78bfa;margin-bottom:12px">Prochains événements</div>'
+    +(future.length===0?'<div style="color:#475569;font-size:13px">Aucun événement.</div>'
+      :future.map(function(e) {
+        return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #1e293b">'
+          +'<div style="width:38px;height:38px;border-radius:10px;background:'+(EVC[e.type]||"#64748b")+'22;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:'+(EVC[e.type]||"#94a3b8")+';flex-shrink:0">'+e.day+'</div>'
+          +'<div style="flex:1"><div style="font-weight:600;font-size:14px">'+e.title+'</div><div style="font-size:12px;color:#64748b">'+e.type+(e.note?" · "+e.note:"")+'</div></div>'
+          +(e.id?'<button onclick="delCE('+e.id+')" style="background:none;border:none;color:#ef4444;font-size:20px;padding:4px 8px">×</button>':"")
+          +'</div>';
+      }).join(""))+'</div>';
+}
+
+function oDayModal(d) {
+  var key = dk(d);
+  TF.evType = "Sortie";
+  var existing = (DB.projects||[]).filter(function(p){ return p.releaseDate===key; }).map(function(p){ return {title:p.title,type:"Sortie"}; })
+    .concat((DB.calEvents||[]).filter(function(e){ return e.date===key; }));
+  document.getElementById("MC").innerHTML =
+    '<div class="overlay" onclick="if(event.target===this)closeModal()">'
+    +'<div class="sheet"><div class="handle"></div>'
+    +'<div style="font-weight:700;font-size:18px;margin-bottom:16px;color:#a78bfa">'+d+" "+MN[calM]+'</div>'
+    +(existing.map(function(e) {
+      return '<div style="font-size:13px;padding:8px 12px;border-radius:10px;background:'+(EVC[e.type]||"#64748b")+'22;color:'+(EVC[e.type]||"#94a3b8")+';margin-bottom:6px;display:flex;justify-content:space-between;align-items:center">'
+        +'<span>'+e.title+' · '+e.type+'</span>'+(e.id?'<span onclick="delCE('+e.id+');closeModal()" style="cursor:pointer;color:#ef4444;font-size:18px">×</span>':"")+'</div>';
+    }).join(""))
+    +'<div class="field"><label>Titre</label><input class="inp" id="ev-t" placeholder="Ex: Drop Single..."/></div>'
+    +'<div class="field"><label>Type</label><div class="cw">'+ET.map(function(t) {
+      return '<button class="chip'+(t==="Sortie"?" on":"")+'" onclick="TF.evType=\''+t+'\';this.closest(\'.cw\').querySelectorAll(\'.chip\').forEach(function(b){b.classList.remove(\'on\')});this.classList.add(\'on\')">'+t+'</button>';
+    }).join("")+'</div></div>'
+    +'<div class="field"><label>Note</label><input class="inp" id="ev-n" placeholder="Spotify, Instagram..."/></div>'
+    +'<div style="display:flex;gap:10px;margin-top:8px">'
+    +'<button class="btnS" style="flex:1" onclick="closeModal()">Fermer</button>'
+    +'<button class="btnP" style="flex:2" onclick="svCE(\''+key+'\')">Ajouter</button>'
+    +'</div></div></div>';
+}
+
+function svCE(key) {
+  var t = document.getElementById("ev-t").value.trim();
+  if (!t) return;
+  save(Object.assign({},DB,{calEvents:(DB.calEvents||[]).concat([{id:Date.now(),title:t,type:TF.evType||"Sortie",note:document.getElementById("ev-n").value,date:key}])}));
+  closeModal();
+}
+
+function delCE(id) {
+  save(Object.assign({},DB,{calEvents:(DB.calEvents||[]).filter(function(e){ return e.id!==id; })}));
+  if (curTab==="calendar") rCalendar();
+}
+
+// BUDGET
+function rBudget() {
+  var expenses = DB.expenses||[];
+  var revenues = DB.revenues||[];
+  var totalR = revenues.reduce(function(s,r){ return s+(parseFloat(r.amount)||0); },0);
+  var totalE = expenses.reduce(function(s,e){ return s+(parseFloat(e.amount)||0); },0);
+  var sol = totalR - totalE;
+  var CI = {Studio:"🎙️","Vidéo":"🎬",Promo:"📣",Distribution:"📡",Graphisme:"🎨","Équipement":"🎛️",Autre:"💳"};
+  var byCat = EC.map(function(c){
+    return {cat:c,total:expenses.filter(function(e){ return e.category===c; }).reduce(function(s,e){ return s+(parseFloat(e.amount)||0); },0)};
+  }).filter(function(x){ return x.total>0; });
+
+  document.getElementById("p-budget").innerHTML =
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
+    +'<span style="font-weight:700;font-size:17px">Budget</span>'
+    +'<button class="btnP" style="width:auto;padding:10px 18px;border-radius:12px;font-size:14px" onclick="oExpForm()">+ Dépense</button></div>'
+    +'<div class="g2">'
+    +'<div class="card" style="margin-bottom:0;border-color:#10b98133"><div style="font-size:12px;color:#64748b">Revenus</div><div style="font-size:22px;font-weight:900;color:#10b981">+'+totalR.toFixed(0)+'€</div></div>'
+    +'<div class="card" style="margin-bottom:0;border-color:#ef444433"><div style="font-size:12px;color:#64748b">Dépenses</div><div style="font-size:22px;font-weight:900;color:#ef4444">-'+totalE.toFixed(0)+'€</div></div>'
+    +'</div>'
+    +'<div class="card" style="background:linear-gradient(135deg,#0f2027,#111827);border-color:'+(sol>=0?"#7c3aed":"#f59e0b")+'44;margin-top:4px">'
+    +'<div style="font-size:12px;color:#64748b">'+(sol>=0?"✅":"⚠️")+' Solde net</div>'
+    +'<div style="font-size:26px;font-weight:900;color:'+(sol>=0?"#7c3aed":"#f59e0b")+'">'+(sol>=0?"+":"")+sol.toFixed(0)+'€</div></div>'
+    +(byCat.length>0?'<div class="card"><div style="font-weight:600;color:#a78bfa;margin-bottom:12px">Par catégorie</div>'
+      +byCat.map(function(b) {
+        var pct = totalE>0?Math.round((b.total/totalE)*100):0;
+        return '<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px">'
+          +'<span>'+(CI[b.cat]||"")+" "+b.cat+'</span><span style="color:'+(ECC[b.cat]||"#64748b")+';font-weight:600">'+b.total.toFixed(0)+'€ <span style="color:#64748b;font-weight:400">('+pct+'%)</span></span></div>'
+          +'<div class="prog"><div class="pb" style="width:'+pct+'%;background:'+(ECC[b.cat]||"#64748b")+'"></div></div></div>';
+      }).join("")+'</div>':"")
+    +'<div class="card"><div style="font-weight:600;color:#a78bfa;margin-bottom:12px">Historique</div>'
+    +(expenses.length===0?'<div style="color:#475569;font-size:13px">Aucune dépense.</div>'
+      :[].concat(expenses).reverse().map(function(e) {
+        return '<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #1e293b">'
+          +'<div style="width:40px;height:40px;border-radius:10px;background:'+(ECC[e.category]||"#64748b")+'22;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">'+(CI[e.category]||"💳")+'</div>'
+          +'<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14px">'+e.label+'</div><div style="font-size:12px;color:#64748b">'+e.category+(e.project?" · "+e.project:"")+'</div></div>'
+          +'<div style="font-weight:800;font-size:15px;color:#ef4444;flex-shrink:0">-'+parseFloat(e.amount).toFixed(0)+'€</div>'
+          +'<button onclick="delExp('+e.id+')" style="background:none;border:none;color:#ef4444;font-size:20px;padding:4px 8px">×</button></div>';
+      }).join(""))+'</div>';
+}
+
+function oExpForm() {
+  TF.exCat = "Studio";
+  document.getElementById("MC").innerHTML =
+    '<div class="overlay" onclick="if(event.target===this)closeModal()">'
+    +'<div class="sheet"><div class="handle"></div>'
+    +'<div style="font-weight:700;font-size:18px;margin-bottom:20px;color:#a78bfa">Nouvelle Dépense</div>'
+    +'<div class="field"><label>Libellé *</label><input class="inp" id="ef-l" placeholder="Ex: Studio..."/></div>'
+    +'<div class="field"><label>Montant (€) *</label><input class="inp" type="number" id="ef-a"/></div>'
+    +'<div class="field"><label>Date</label><input class="inp" type="date" id="ef-d"/></div>'
+    +'<div class="field"><label>Projet lié</label><input class="inp" id="ef-p"/></div>'
+    +'<div class="field"><label>Catégorie</label><div class="cw">'+EC.map(function(c) {
+      return '<button class="chip'+(c==="Studio"?" on":"")+'" onclick="TF.exCat=\''+c.replace(/'/g,"\\'")+'\';this.closest(\'.cw\').querySelectorAll(\'.chip\').forEach(function(b){b.classList.remove(\'on\')});this.classList.add(\'on\')">'+c+'</button>';
+    }).join("")+'</div></div>'
+    +'<div style="display:flex;gap:10px;margin-top:8px">'
+    +'<button class="btnS" style="flex:1" onclick="closeModal()">Annuler</button>'
+    +'<button class="btnP" style="flex:2" onclick="svExp()">Sauvegarder</button>'
+    +'</div></div></div>';
+}
+
+function svExp() {
+  var l = document.getElementById("ef-l").value.trim();
+  var a = parseFloat(document.getElementById("ef-a").value);
+  if (!l||!a) return;
+  save(Object.assign({},DB,{expenses:(DB.expenses||[]).concat([{id:Date.now(),label:l,amount:a,date:document.getElementById("ef-d").value,project:document.getElementById("ef-p").value,category:TF.exCat||"Studio"}])}));
+  closeModal();
+}
+
+function delExp(id) {
+  save(Object.assign({},DB,{expenses:(DB.expenses||[]).filter(function(e){ return e.id!==id; })}));
+}
+
+// CONTACTS
+function rContacts() {
+  var CI = {Label:"🏷️",Distribution:"📡","Média":"📰",Playlist:"🎧",Booking:"🎤",Sponsor:"💰",Autre:"👤"};
+  document.getElementById("p-contacts").innerHTML =
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
+    +'<span style="font-weight:700;font-size:17px">Contacts</span>'
+    +'<button class="btnP" style="width:auto;padding:10px 18px;border-radius:12px;font-size:14px" onclick="oConForm()">+ Ajouter</button></div>'
+    +((DB.contacts||[]).length===0?'<div style="color:#475569;text-align:center;padding:40px">Aucun contact.</div>'
+      :(DB.contacts||[]).map(function(c) {
+        return '<div class="card"><div style="display:flex;gap:12px;align-items:flex-start">'
+          +'<div style="width:44px;height:44px;border-radius:12px;background:'+(CC[c.type]||"#64748b")+'22;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">'+(CI[c.type]||"👤")+'</div>'
+          +'<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:15px;margin-bottom:4px">'+c.name+'</div>'
+          +'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">'+tg(CC[c.type]||"#64748b",c.type)+tg("#64748b",c.status)+'</div>'
+          +(c.email?'<div style="font-size:13px;color:#64748b">✉️ '+c.email+'</div>':"")
+          +(c.phone?'<div style="font-size:13px;color:#64748b">📞 '+c.phone+'</div>':"")
+          +(c.note?'<div style="font-size:12px;color:#94a3b8;font-style:italic;margin-top:4px">'+c.note+'</div>':"")+'</div>'
+          +'<div style="display:flex;gap:6px;flex-shrink:0">'
+          +'<button onclick="oConForm('+c.id+')" style="background:#1e293b;border:none;border-radius:10px;padding:8px 12px;color:#94a3b8">✏️</button>'
+          +'<button onclick="delCon('+c.id+')" style="background:#1e293b;border:none;border-radius:10px;padding:8px 12px;color:#ef4444">🗑️</button>'
+          +'</div></div></div>';
+      }).join(""));
+}
+
+function oConForm(id) {
+  var c = id?(DB.contacts||[]).find(function(x){ return x.id===id; }):null;
+  TF = c?JSON.parse(JSON.stringify(c)):{name:"",type:"Label",status:"À contacter",email:"",phone:"",note:""};
+  document.getElementById("MC").innerHTML =
+    '<div class="overlay" onclick="if(event.target===this)closeModal()">'
+    +'<div class="sheet"><div class="handle"></div>'
+    +'<div style="font-weight:700;font-size:18px;margin-bottom:20px;color:#a78bfa">'+(id?"Modifier":"Nouveau Contact")+'</div>'
+    +'<div class="field"><label>Nom *</label><input class="inp" id="cf-n" value="'+(TF.name||"")+'"/></div>'
+    +'<div class="field"><label>Email</label><input class="inp" type="email" id="cf-e" value="'+(TF.email||"")+'"/></div>'
+    +'<div class="field"><label>Téléphone</label><input class="inp" type="tel" id="cf-p" value="'+(TF.phone||"")+'"/></div>'
+    +'<div class="field"><label>Type</label><div class="cw">'+CT.map(function(t) {
+      var active = TF.type===t; var col = CC[t]||"#7c3aed";
+      return '<button class="chip'+(active?" on":"")+'" style="'+(active?"background:"+col+"22;border-color:"+col+";color:"+col:"")
+        +'" onclick="TF.type=\''+t+'\';this.closest(\'.cw\').querySelectorAll(\'.chip\').forEach(function(b){b.classList.remove(\'on\');b.removeAttribute(\'style\')});this.classList.add(\'on\');this.style.background=\''+col+'22\';this.style.borderColor=\''+col+'\';this.style.color=\''+col+'\'">'+t+'</button>';
+    }).join("")+'</div></div>'
+    +'<div class="field"><label>Statut</label><div class="cw">'+CS.map(function(s) {
+      return '<button class="chip'+(TF.status===s?" on":"")+'" onclick="TF.status=\''+s.replace(/'/g,"\\'")+'\';this.closest(\'.cw\').querySelectorAll(\'.chip\').forEach(function(b){b.classList.remove(\'on\')});this.classList.add(\'on\')">'+s+'</button>';
+    }).join("")+'</div></div>'
+    +'<div class="field"><label>Notes</label><textarea class="inp" id="cf-no" rows="2">'+(TF.note||"")+'</textarea></div>'
+    +'<div style="display:flex;gap:10px;margin-top:8px">'
+    +'<button class="btnS" style="flex:1" onclick="closeModal()">Annuler</button>'
+    +'<button class="btnP" style="flex:2" onclick="svCon('+(id||"null")+')">Sauvegarder</button>'
+    +'</div></div></div>';
+}
+
+function svCon(id) {
+  var c = Object.assign({},TF,{name:document.getElementById("cf-n").value,email:document.getElementById("cf-e").value,phone:document.getElementById("cf-p").value,note:document.getElementById("cf-no").value});
+  if (!c.name) return;
+  var list = DB.contacts||[];
+  if (id) list = list.map(function(x){ return x.id===id?Object.assign({},c,{id:id}):x; });
+  else list = list.concat([Object.assign({},c,{id:Date.now()})]);
+  save(Object.assign({},DB,{contacts:list}));
+  closeModal();
+}
+
+function delCon(id) {
+  if (confirm("Supprimer ce contact ?"))
+    save(Object.assign({},DB,{contacts:(DB.contacts||[]).filter(function(c){ return c.id!==id; })}));
+}
+
+// REVENUES
+function rRevenues() {
+  var revenues = DB.revenues||[];
+  var total = revenues.reduce(function(s,r){ return s+(parseFloat(r.amount)||0); },0);
+  var RI = {Streaming:"▶️",Live:"🎤",Sync:"🎬",Droits:"©️",Vente:"💿",Autre:"💵"};
+  document.getElementById("p-revenues").innerHTML =
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
+    +'<span style="font-weight:700;font-size:17px">Revenus</span>'
+    +'<button class="btnP" style="width:auto;padding:10px 18px;border-radius:12px;font-size:14px" onclick="oRevForm()">+ Ajouter</button></div>'
+    +'<div class="card" style="background:linear-gradient(135deg,#0f2027,#111827);border-color:#10b98133">'
+    +'<div style="font-size:13px;color:#64748b;margin-bottom:4px">Total</div>'
+    +'<div style="font-size:32px;font-weight:900;color:#10b981">'+total.toLocaleString("fr-FR",{style:"currency",currency:"EUR"})+'</div></div>'
+    +'<div class="card"><div style="font-weight:600;color:#a78bfa;margin-bottom:12px">Historique</div>'
+    +(revenues.length===0?'<div style="color:#475569;font-size:13px">Aucun revenu.</div>'
+      :[].concat(revenues).reverse().map(function(r) {
+        return '<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #1e293b">'
+          +'<div style="width:40px;height:40px;border-radius:10px;background:'+(TC[r.type]||"#64748b")+'22;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">'+(RI[r.type]||"💵")+'</div>'
+          +'<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14px">'+r.label+'</div><div style="font-size:12px;color:#64748b">'+r.type+(r.project?" · "+r.project:"")+'</div></div>'
+          +'<div style="font-weight:800;font-size:15px;color:#10b981;flex-shrink:0">+'+parseFloat(r.amount).toFixed(0)+'€</div>'
+          +'<button onclick="delRev('+r.id+')" style="background:none;border:none;color:#ef4444;font-size:20px;padding:4px 8px">×</button></div>';
+      }).join(""))+'</div>';
+}
+
+function oRevForm() {
+  TF.rType = "Streaming";
+  document.getElementById("MC").innerHTML =
+    '<div class="overlay" onclick="if(event.target===this)closeModal()">'
+    +'<div class="sheet"><div class="handle"></div>'
+    +'<div style="font-weight:700;font-size:18px;margin-bottom:20px;color:#a78bfa">Nouveau Revenu</div>'
+    +'<div class="field"><label>Libellé *</label><input class="inp" id="rf-l"/></div>'
+    +'<div class="field"><label>Montant (€) *</label><input class="inp" type="number" id="rf-a"/></div>'
+    +'<div class="field"><label>Date</label><input class="inp" type="date" id="rf-d"/></div>'
+    +'<div class="field"><label>Projet lié</label><input class="inp" id="rf-p"/></div>'
+    +'<div class="field"><label>Type</label><div class="cw">'+RT.map(function(t) {
+      return '<button class="chip'+(t==="Streaming"?" on":"")+'" onclick="TF.rType=\''+t+'\';this.closest(\'.cw\').querySelectorAll(\'.chip\').forEach(function(b){b.classList.remove(\'on\')});this.classList.add(\'on\')">'+t+'</button>';
+    }).join("")+'</div></div>'
+    +'<div style="display:flex;gap:10px;margin-top:8px">'
+    +'<button class="btnS" style="flex:1" onclick="closeModal()">Annuler</button>'
+    +'<button class="btnP" style="flex:2" onclick="svRev()">Sauvegarder</button>'
+    +'</div></div></div>';
+}
+
+function svRev() {
+  var l = document.getElementById("rf-l").value.trim();
+  var a = parseFloat(document.getElementById("rf-a").value);
+  if (!l||!a) return;
+  save(Object.assign({},DB,{revenues:(DB.revenues||[]).concat([{id:Date.now(),label:l,amount:a,date:document.getElementById("rf-d").value,project:document.getElementById("rf-p").value,type:TF.rType||"Streaming"}])}));
+  closeModal();
+}
+
+function delRev(id) {
+  save(Object.assign({},DB,{revenues:(DB.revenues||[]).filter(function(r){ return r.id!==id; })}));
+}
+
+// SOCIAL
+var SS = {network:"Instagram",postType:"Annonce sortie",project:"",custom:"",result:"",loading:false};
+
+function rSocial() {
+  var NI = {Instagram:"📸",TikTok:"🎵","X (Twitter)":"🐦",Facebook:"👥",YouTube:"▶️"};
+  document.getElementById("p-social").innerHTML =
+    '<div style="font-weight:700;font-size:17px;margin-bottom:16px">Contenu Réseaux Sociaux IA</div>'
+    +'<div class="card">'
+    +'<div class="field"><label>Réseau</label><div class="sx">'+SN.map(function(n) {
+      return '<button class="chip'+(SS.network===n?" on":"")+'" onclick="SS.network=\''+n+'\';rSocial()" style="flex-shrink:0">'+(NI[n]||"")+" "+n+'</button>';
+    }).join("")+'</div></div>'
+    +'<div class="field"><label>Type de post</label><div class="cw">'+SP.map(function(t) {
+      return '<button class="chip'+(SS.postType===t?" on":"")+'" onclick="SS.postType=\''+t.replace(/'/g,"\\'")+'\';rSocial()">'+t+'</button>';
+    }).join("")+'</div></div>'
+    +'<div class="field"><label>Projet lié</label><select class="inp" onchange="SS.project=this.value"><option value="">— Aucun —</option>'
+    +(DB.projects||[]).map(function(p){ return '<option value="'+p.title+'"'+(SS.project===p.title?" selected":"")+'>'+p.title+'</option>'; }).join("")
+    +'</select></div>'
+    +'<div class="field"><label>Détails (optionnel)</label><input class="inp" value="'+SS.custom+'" oninput="SS.custom=this.value" placeholder="sortie vendredi..."/></div>'
+    +'<button class="btnP" onclick="genSocial()" '+(SS.loading?"disabled":"")+' style="opacity:'+(SS.loading?.6:1)+'">'+(SS.loading?"Génération...":"✨ Générer le post")+'</button>'
+    +'</div>'
+    +(SS.result?'<div class="card" style="border-color:#ec4899aa">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'
+      +'<div style="font-weight:600;color:#ec4899">'+(NI[SS.network]||"")+" Post "+SS.network+'</div>'
+      +'<button onclick="navigator.clipboard.writeText(SS.result)" style="background:#1e293b;border:none;border-radius:10px;padding:8px 14px;color:#94a3b8;font-size:13px">Copier</button></div>'
+      +'<div style="font-size:14px;color:#e2e8f0;line-height:1.8;white-space:pre-wrap">'+SS.result+'</div></div>':"");
+}
+
+async function genSocial() {
+  var proj = (DB.projects||[]).find(function(p){ return p.title===SS.project; });
+  var pi = proj?"Titre: "+proj.title+", Type: "+proj.type+", "+proj.streams+" streams":"Projet M2K";
+  SS.loading=true; SS.result=""; rSocial();
+  try {
+    var r = await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:800,messages:[{role:"user",content:"Expert marketing musical. Crée un post "+SS.network+" pour M2K. Type: "+SS.postType+". Projet: "+pi+(SS.custom?". Contexte: "+SS.custom:"")+". Caption avec emojis, hashtags, call-to-action."}]})});
+    var d = await r.json();
+    SS.result = d.content&&d.content[0]?d.content[0].text:"Erreur.";
+  } catch(e) { SS.result="Erreur de connexion."; }
+  SS.loading=false; rSocial();
+}
+
+// PITCH
+var PS = {lang:"fr",target:"Label",custom:"",result:"",loading:false};
+
+function rPitch() {
+  document.getElementById("p-pitch").innerHTML =
+    '<div style="font-weight:700;font-size:17px;margin-bottom:16px">Générateur Pitch IA</div>'
+    +'<div class="card">'
+    +'<div class="field"><label>Langue</label><div style="display:flex;gap:10px">'
+    +'<button class="chip'+(PS.lang==="fr"?" on":"")+'" onclick="PS.lang=\'fr\';rPitch()" style="flex:1;text-align:center">🇫🇷 Français</button>'
+    +'<button class="chip'+(PS.lang==="en"?" on":"")+'" onclick="PS.lang=\'en\';rPitch()" style="flex:1;text-align:center">🇬🇧 English</button>'
+    +'</div></div>'
+    +'<div class="field"><label>Destinataire</label><select class="inp" onchange="PS.target=this.value">'
+    +["Label","Distribution","Média","Playlist curator","Booking agent","Sponsor","Investisseur"].map(function(t){ return '<option'+(PS.target===t?" selected":"")+'>'+t+'</option>'; }).join("")
+    +'</select></div>'
+    +'<div class="field"><label>Contexte (optionnel)</label><input class="inp" value="'+PS.custom+'" oninput="PS.custom=this.value" placeholder="showcase Paris..."/></div>'
+    +'<button class="btnP" onclick="genPitch()" '+(PS.loading?"disabled":"")+' style="opacity:'+(PS.loading?.6:1)+'">'+(PS.loading?"Génération...":"✨ Générer le Pitch")+'</button>'
+    +'</div>'
+    +(PS.result?'<div class="card" style="border-color:#7c3aed44">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'
+      +'<div style="font-weight:600;color:#a78bfa">Pitch généré</div>'
+      +'<button onclick="navigator.clipboard.writeText(PS.result)" style="background:#1e293b;border:none;border-radius:10px;padding:8px 14px;color:#94a3b8;font-size:13px">Copier</button></div>'
+      +'<div style="font-size:14px;color:#e2e8f0;line-height:1.8;white-space:pre-wrap">'+PS.result+'</div></div>':"");
+}
+
+async function genPitch() {
+  var pl = (DB.projects||[]).map(function(p){ return p.title+" ("+p.type+", "+(p.streams||0)+" streams)"; }).join(", ");
+  PS.loading=true; PS.result=""; rPitch();
+  try {
+    var r = await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:800,messages:[{role:"user",content:"Expert stratégie musicale. Pitch "+(PS.lang==="fr"?"en français":"in English")+" pour M2K destiné à "+PS.target+(PS.custom?", contexte: "+PS.custom:"")+". Projets: "+(pl||"Aucun")+". 150 mots, accroche forte, call-to-action."}]})});
+    var d = await r.json();
+    PS.result = d.content&&d.content[0]?d.content[0].text:"Erreur.";
+  } catch(e) { PS.result="Erreur de connexion."; }
+  PS.loading=false; rPitch();
+}
+
+// INIT
+window.onload = function() { loadDB(); };
+</script>
+</body>
+</html>
